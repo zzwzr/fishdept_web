@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fishdept</title>
+
+    <link rel="stylesheet" href="./assets/css/style.css">
+    <link rel="stylesheet" href="./assets/css/popup.css">
+    <link rel="stylesheet" href="./assets/css/chess.css">
+</head>
+
+<body>
+    <!-- 顶部导航栏 - 绝对定位 -->
+    <div class="top-nav">
+        <div class="logo-section">
+            <h1>Fishdept</h1>
+            <p class="description">摸鱼大事儿</p>
+        </div>
+
+        <div class="user-section">
+            <div class="user-info">
+                <div class="user-name" id="user-name">游客</div>
+                <div id="login-status">未登录</div>
+            </div>
+            <button id="login-btn" class="login-btn">登录 / 注册</button>
+            <button id="logout-btn" class="logout-btn" style="display: none;">退出</button>
+        </div>
+    </div>
+
+    <!-- 主容器 -->
+    <div class="container">
+        <!-- 左侧选项卡 -->
+        <div class="sidebar">
+            <div class="tab-title">玩法</div>
+            <div class="tab-item active" data-tab="tic-tac-toe">井字棋</div>
+            <div class="tab-item" data-tab="chess">象棋</div>
+            <!-- <div class="tab-item" data-tab="go">围棋</div>
+            <div class="tab-item" data-tab="battleship">海战棋</div> -->
+
+            <!-- 房间列表 -->
+            <div class="room-list">
+                <div class="room-list-title">房间列表</div>
+
+            </div>
+
+            <!-- 在线人数 -->
+            <div class="online-count">
+                <div>当前在线人数</div>
+                <div class="online-count-value" id="online-count"></div>
+            </div>
+        </div>
+
+        <!-- 主内容区域 -->
+        <div class="main-content">
+            <div class="status-panel">
+                <div class="status-item">
+                    <div>房间名称</div>
+                    <div id="room-name" class="status-value"></div>
+                </div>
+                <div class="status-item">
+                    <div>游戏状态</div>
+                    <div id="game-state" class="status-value"></div>
+                </div>
+                <div class="status-item">
+                    <div>房间号</div>
+                    <div id="room-id" class="status-value"></div>
+                </div>
+            </div>
+
+            <div class="game-content">
+                <div class="game-header">
+                    <div class="" id="game-title">井字棋</div>
+
+                    <!-- 玩家信息展示 -->
+                    <div class="players-display">
+                        <div class="player-card" id="player1-card">
+                            <div class="player-name" id="player1-name">玩家1</div>
+                            <div class="player-status" id="player1-status">等待加入</div>
+                            <!-- <button class="join-player-btn" data-player="1">加入玩家1</button> -->
+                        </div>
+                        <div class="player-card" id="player2-card">
+                            <div class="player-name" id="player2-name">玩家2</div>
+                            <div class="player-status" id="player2-status">等待加入</div>
+                            <!-- <button class="join-player-btn" data-player="2">加入玩家2</button> -->
+                        </div>
+                    </div>
+
+                    <div class="game-controls">
+                        <button class="control-btn" id="new-game-btn">创建房间</button>
+                        <button class="control-btn start-game-btn" id="start-game-btn" disabled>开始游戏</button>
+                    </div>
+                </div>
+
+                <div class="game-area">
+                    <div class="tictactoe-board" id="tictactoe-board">
+                        <div class="cell" data-index="0"></div>
+                        <div class="cell" data-index="1"></div>
+                        <div class="cell" data-index="2"></div>
+                        <div class="cell" data-index="3"></div>
+                        <div class="cell" data-index="4"></div>
+                        <div class="cell" data-index="5"></div>
+                        <div class="cell" data-index="6"></div>
+                        <div class="cell" data-index="7"></div>
+                        <div class="cell" data-index="8"></div>
+                    </div>
+                    <div class="chess-board" id="chess-board" style="display: none;">
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 登录弹窗 -->
+    <div id="login-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modal-title">用户登录</h2>
+                <button class="close-btn" id="close-modal">&times;</button>
+            </div>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="username">用户名</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">密码</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="submit-btn">登录</button>
+                    <button type="button" class="cancel-btn" id="cancel-login">取消</button>
+                </div>
+                <div class="form-switch">
+                    还没有账号？<a id="switch-to-register">立即注册</a>
+                </div>
+            </form>
+
+            <form id="register-form" style="display: none;">
+                <div class="form-group">
+                    <label for="reg-username">用户名</label>
+                    <input type="text" id="reg-username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="reg-password">密码</label>
+                    <input type="password" id="reg-password" name="password" required>
+                </div>
+                <div class="form-group">
+                    <label for="reg-email">电子邮箱</label>
+                    <input type="email" id="reg-email" name="email" required>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="submit-btn">注册</button>
+                    <button type="button" class="cancel-btn" id="cancel-register">取消</button>
+                </div>
+                <div class="form-switch">
+                    已有账号？<a id="switch-to-login">立即登录</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 创建房间弹窗 -->
+    <div id="create-room-modal" class="modal room-info-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">创建房间</h2>
+                <button class="close-btn" id="close-create-room-modal">&times;</button>
+            </div>
+            <form id="create-room-form">
+                <div class="form-group">
+                    <label for="room-name-input">房间名称</label>
+                    <input type="text" id="room-name-input" name="room-name" placeholder="请输入房间名称" required>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="submit-btn">创建房间</button>
+                    <button type="button" class="cancel-btn" id="cancel-create-room">取消</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 游戏结束弹窗 -->
+    <div id="game-over-modal" class="modal game-over-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">游戏结束</h2>
+                <button class="close-btn" id="close-game-over-modal">&times;</button>
+            </div>
+            <div class="game-result" id="game-result">平局！</div>
+            <div class="game-over-buttons">
+                <button class="restart-btn" id="restart-game-btn">重新开始</button>
+                <button class="exit-room-btn" id="exit-room-btn">退出房间</button>
+            </div>
+        </div>
+    </div>
+    <script src="./assets/js/host.js"></script>
+    <script src="./assets/js/utils.js"></script>
+    <script src="./assets/js/websocket.js"></script>
+    <script src="./assets/js/api.js"></script>
+    <script src="./assets/js/app.js"></script>
+    <script src="./assets/js/game/tictactoe.js"></script>
+    <script src="./assets/js/game/chess.js"></script>
+    <script>
+        const browserId = getBrowserId();
+
+        document.addEventListener('DOMContentLoaded', async function () {
+
+            // 房间状态变量
+            let currentRoom = null;
+
+            // 游戏名称元素
+            const gameTitle = document.getElementById('game-title');
+
+            // 创建房间相关元素
+            const newGameBtn = document.getElementById('new-game-btn');
+            const createRoomModal = document.getElementById('create-room-modal');
+            const closeCreateRoomModalBtn = document.getElementById('close-create-room-modal');
+            const cancelCreateRoom = document.getElementById('cancel-create-room');
+            const createRoomForm = document.getElementById('create-room-form');
+            const roomNameInput = document.getElementById('room-name-input');
+
+            // 房间信息相关元素
+            const closeRoomModal = document.getElementById('close-room-modal');
+            const copyRoomCode = document.getElementById('copy-room-code');
+            const shareRoomLink = document.getElementById('share-room-link');
+            const roomGameType = document.getElementById('room-game-type');
+            const roomNameDisplay = document.getElementById('room-name-display'); // 修复：添加这个元素引用
+
+            // 玩家信息元素
+            const player1Card = document.getElementById('player1-card');
+            const player2Card = document.getElementById('player2-card');
+
+            // 游戏结束相关元素
+
+
+            // 选项卡元素
+            const tabItems = document.querySelectorAll('.tab-item');
+
+            // 显示浏览器ID
+            // browserIdElement.textContent = getBrowserId();
+
+            // 创建房间功能
+            newGameBtn.addEventListener('click', function () {
+                createRoomModal.style.display = 'flex';
+            });
+
+            function closeCreateRoomModal() {
+                createRoomModal.style.display = 'none';
+            }
+            closeCreateRoomModalBtn.addEventListener('click', closeCreateRoomModal);
+            cancelCreateRoom.addEventListener('click', closeCreateRoomModal);
+
+            createRoomForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+                const roomName = roomNameInput.value;
+
+                createRoom(roomName);
+                closeCreateRoomModal();
+            });
+
+            // 游戏结束弹窗
+            function closeGameOverModal() {
+                gameOverModal.style.display = 'none';
+            }
+
+            closeGameOverModalBtn.addEventListener('click', closeGameOverModal);
+
+            // 重新开始游戏
+            restartGameBtn.addEventListener('click', function () {
+                resetGame();
+                closeGameOverModal();
+                restartGame(roomIdElement.textContent);
+            });
+
+            // 退出房间
+            exitRoomBtn.addEventListener('click', function () {
+                showToast('没这功能！', 'error');
+                // currentRoom = null;
+                // currentPlayerRole = null;
+                // resetGame();
+                // closeGameOverModal();
+
+                // // 重置玩家显示
+                // player1Name.textContent = '玩家1';
+                // player2Name.textContent = '玩家2';
+                // player1Status.textContent = '等待加入';
+                // player2Status.textContent = '等待加入';
+                // player1Card.classList.remove('occupied');
+                // player2Card.classList.remove('occupied');
+                // gameState.textContent = '等待开始';
+                // startGameBtn.disabled = true;
+            });
+
+            // 选项卡切换
+            tabItems.forEach(tab => {
+                tab.addEventListener('click', function () {
+
+                    tabItems.forEach(item => item.classList.remove('active'));
+
+                    this.classList.add('active');
+
+                    // 更新当前游戏和标题
+                    const gameName = this.getAttribute('data-tab');
+                    let displayName = '';
+
+                    switch (gameName) {
+                        case 'tic-tac-toe':
+                            displayName = '井字棋';
+                            setupTicTacToe();
+                            break;
+                        case 'chess':
+                            displayName = '象棋';
+                            setupChess();
+                            break;
+                    }
+
+                    gameTitle.textContent = displayName;
+                });
+            });
+            // 加载房间列表
+            loadRoomList();
+
+            // 在线人数
+            loadLink();
+
+            // setInterval(() => {
+            //     loadRoomList();
+            //     loadLink();
+            // }, 5000);
+
+            // 加载是否在房间内
+            loadRoom();
+
+            // 首页进来井字棋
+            setupTicTacToe();
+
+            connectWebSocket(browserId)
+        });
+        // 问题1：加入别的房间，然后再创建房间，p2位置的名字也是自己（应该只有p1是自己）
+        // 问题2：在线人数刷新会闪烁一下
+    </script>
+</body>
+
+</html>

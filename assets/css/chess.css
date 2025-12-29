@@ -1,0 +1,344 @@
+/* chess.css - 象棋棋盘样式 */
+
+/* 象棋棋盘容器 */
+.chess-board {
+    width: 650px;
+    height: 720px;
+    background: #f0d9b5; /* 木色背景 */
+    border: 10px solid #8b4513; /* 深棕色边框 */
+    border-radius: 5px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    grid-template-rows: repeat(10, 1fr);
+    gap: 0;
+    padding: 15px;
+    position: relative;
+    overflow: visible;
+}
+
+/* 棋盘网格线 */
+.chess-board::before {
+    content: '';
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    right: 15px;
+    bottom: 15px;
+    background: transparent;
+    border: 2px solid #000;
+}
+
+/* 垂直线 */
+.chess-board::after {
+    content: '';
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    right: 15px;
+    bottom: 15px;
+    background-image: 
+        linear-gradient(to right, transparent 0%, transparent 11.11%, #000 11.11%, #000 11.2%, transparent 11.2%, transparent 22.22%, #000 22.22%, #000 22.31%, transparent 22.31%, transparent 33.33%, #000 33.33%, #000 33.42%, transparent 33.42%, transparent 44.44%, #000 44.44%, #000 44.53%, transparent 44.53%, transparent 55.55%, #000 55.55%, #000 55.64%, transparent 55.64%, transparent 66.66%, #000 66.66%, #000 66.75%, transparent 66.75%, transparent 77.77%, #000 77.77%, #000 77.86%, transparent 77.86%, transparent 88.88%, #000 88.88%, #000 88.97%, transparent 88.97%, transparent 100%);
+    background-size: 100% 100%;
+    opacity: 0.8;
+}
+
+/* 水平线 */
+.chess-board::after {
+    background-image: 
+        linear-gradient(to bottom, transparent 0%, transparent 10%, #000 10%, #000 10.2%, transparent 10.2%, transparent 20%, #000 20%, #000 20.2%, transparent 20.2%, transparent 30%, #000 30%, #000 30.2%, transparent 30.2%, transparent 40%, #000 40%, #000 40.2%, transparent 40.2%, transparent 50%, #000 50%, #000 50.2%, transparent 50.2%, transparent 60%, #000 60%, #000 60.2%, transparent 60.2%, transparent 70%, #000 70%, #000 70.2%, transparent 70.2%, transparent 80%, #000 80%, #000 80.2%, transparent 80.2%, transparent 90%, #000 90%, #000 90.2%, transparent 90.2%, transparent 100%),
+        linear-gradient(to right, transparent 0%, transparent 11.11%, #000 11.11%, #000 11.2%, transparent 11.2%, transparent 22.22%, #000 22.22%, #000 22.31%, transparent 22.31%, transparent 33.33%, #000 33.33%, #000 33.42%, transparent 33.42%, transparent 44.44%, #000 44.44%, #000 44.53%, transparent 44.53%, transparent 55.55%, #000 55.55%, #000 55.64%, transparent 55.64%, transparent 66.66%, #000 66.66%, #000 66.75%, transparent 66.75%, transparent 77.77%, #000 77.77%, #000 77.86%, transparent 77.86%, transparent 88.88%, #000 88.88%, #000 88.97%, transparent 88.97%, transparent 100%);
+}
+
+/* 河界 */
+.river {
+    position: absolute;
+    top: 50%;
+    left: 15px;
+    right: 15px;
+    height: 2px;
+    background: transparent;
+    z-index: 1;
+}
+
+.river::before {
+    content: '楚河 汉界';
+    position: absolute;
+    top: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 24px;
+    font-weight: bold;
+    color: #8b0000;
+    letter-spacing: 10px;
+    white-space: nowrap;
+}
+
+/* 九宫 */
+.palace {
+    position: absolute;
+    width: 30%;
+    height: 30%;
+    border: 2px solid #000;
+    top: 15px;
+    left: 35%;
+    z-index: 1;
+}
+
+.palace.bottom {
+    top: auto;
+    bottom: 15px;
+}
+
+.palace::before,
+.palace::after {
+    content: '';
+    position: absolute;
+    background: transparent;
+    border: 1px solid #000;
+}
+
+.palace::before {
+    width: 33.33%;
+    height: 100%;
+    left: 33.33%;
+}
+
+.palace::after {
+    width: 100%;
+    height: 33.33%;
+    top: 33.33%;
+}
+
+/* 交叉点标记 */
+.intersection {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: #000;
+    border-radius: 50%;
+    z-index: 2;
+}
+
+.intersection.top-left { top: 42px; left: 42px; }
+.intersection.top-right { top: 42px; right: 42px; }
+.intersection.bottom-left { bottom: 42px; left: 42px; }
+.intersection.bottom-right { bottom: 42px; right: 42px; }
+
+/* 棋子容器 */
+.chess-piece-container {
+    position: absolute;
+    width: 65px;
+    height: 65px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.chess-piece-container:hover {
+    transform: scale(1.1);
+    z-index: 20;
+}
+
+/* 棋子样式 */
+.chess-piece {
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.2s ease;
+}
+
+/* 红色棋子 */
+.piece-red {
+    background: linear-gradient(135deg, #d10000, #ff3333);
+    color: #fff;
+    border: 2px solid #b30000;
+}
+
+/* 黑色棋子 */
+.piece-black {
+    background: linear-gradient(135deg, #222, #444);
+    color: #fff;
+    border: 2px solid #000;
+}
+
+/* 棋子上的汉字 */
+.piece-text {
+    font-family: 'SimHei', '黑体', sans-serif;
+}
+
+/* 棋盘坐标标记 */
+.coordinate {
+    position: absolute;
+    font-size: 14px;
+    color: #8b4513;
+    font-weight: bold;
+    z-index: 1;
+}
+
+.coordinate.top { top: 0; }
+.coordinate.bottom { bottom: 0; }
+.coordinate.left { left: 0; }
+.coordinate.right { right: 0; }
+
+/* 选中状态 */
+.piece-selected {
+    box-shadow: 0 0 15px #ffcc00, 0 0 20px #ffcc00;
+    transform: scale(1.1);
+    z-index: 30;
+}
+
+/* 可移动位置提示 */
+.move-hint {
+    position: absolute;
+    width: 15px;
+    height: 15px;
+    background: rgba(0, 255, 0, 0.5);
+    border-radius: 50%;
+    z-index: 5;
+    pointer-events: none;
+}
+
+/* 象棋游戏内容区域调整 */
+.game-content.chess-mode {
+    padding: 15px;
+}
+
+.game-content.chess-mode .game-header {
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+}
+
+/* 调整状态面板位置以适应象棋棋盘 */
+.game-content.chess-mode .status-panel {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    width: 200px;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 100;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 15px;
+    border-radius: 8px;
+    backdrop-filter: blur(5px);
+}
+
+.game-content.chess-mode .status-item {
+    margin: 0;
+    padding: 10px;
+    min-width: auto;
+}
+
+/* 移动游戏标题到左侧 */
+.game-content.chess-mode {
+    width: auto;
+    text-align: left;
+    padding-left: 20px;
+}
+
+/* 调整玩家显示位置 */
+.game-content.chess-mode .players-display {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    right: 20px;
+    justify-content: space-between;
+}
+
+.game-content.chess-mode .player-card {
+    min-width: 120px;
+    margin: 0;
+}
+
+/* 调整游戏控制按钮位置 */
+.game-content.chess-mode .game-controls {
+    position: absolute;
+    top: 10px;
+    left: 20px;
+    width: auto;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.game-content.chess-mode .control-btn {
+    padding: 8px 12px;
+    font-size: 0.9rem;
+}
+
+/* 响应式调整 */
+@media (max-width: 1024px) {
+    .chess-board {
+        width: 550px;
+        height: 620px;
+    }
+    
+    .chess-piece {
+        width: 45px;
+        height: 45px;
+        font-size: 20px;
+    }
+    
+    .chess-piece-container {
+        width: 55px;
+        height: 55px;
+    }
+}
+
+@media (max-width: 768px) {
+    .chess-board {
+        width: 450px;
+        height: 520px;
+        padding: 10px;
+    }
+    
+    .chess-piece {
+        width: 35px;
+        height: 35px;
+        font-size: 16px;
+    }
+    
+    .chess-piece-container {
+        width: 45px;
+        height: 45px;
+    }
+    
+    .game-content.chess-mode .status-panel {
+        position: relative;
+        width: 100%;
+        flex-direction: row;
+        top: auto;
+        right: auto;
+        margin-bottom: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .chess-board {
+        width: 350px;
+        height: 420px;
+    }
+    
+    .chess-piece {
+        width: 30px;
+        height: 30px;
+        font-size: 14px;
+    }
+    
+    .chess-piece-container {
+        width: 35px;
+        height: 35px;
+    }
+}

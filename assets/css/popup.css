@@ -1,0 +1,56 @@
+/* 背景遮罩（透明背景，不虚化） */
+.custom-toast-mask {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: transparent; /* 完全透明背景 */
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* 顶部对齐 */
+    z-index: 2000;
+    opacity: 0;
+    /* 移除 backdrop-filter */
+    transition: opacity 0.3s ease;
+    pointer-events: none; /* 允许点击穿透 */
+}
+
+.custom-toast-mask.show {
+    opacity: 1;
+}
+
+/* 提示框主体 - 定位在中间顶部 */
+.custom-toast {
+    padding: 16px 32px;
+    border-radius: 12px;
+    color: #fff;
+    font-size: 1.06rem;
+    max-width: 320px;
+    text-align: center;
+    line-height: 1.6;
+    margin-top: 80px; /* 距离顶部距离 */
+
+    /* 阴影效果保留，但移除内阴影 */
+    box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+
+    opacity: 0;
+    transform: translateY(-20px) scale(0.96); /* 从上往下弹出 */
+    transition: all 0.3s cubic-bezier(.18,.89,.32,1.28);
+    pointer-events: auto; /* 允许点击提示框本身 */
+}
+
+.custom-toast-mask.show .custom-toast {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+/* 🌿 成功：柔和薄荷绿色渐变 */
+.toast-success {
+    background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+}
+
+/* 🌹 失败：柔和玫瑰红渐变 */
+.toast-error {
+    background: linear-gradient(135deg, #ff5f6d 0%, #d9534f 100%);
+}
