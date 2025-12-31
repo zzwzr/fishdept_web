@@ -265,6 +265,13 @@ body {
     border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 
+.game-title {
+    font-size: 2rem;
+    color: #fdbb2d;
+    width: 200px;
+    text-align: center;
+}
+
 .players-display {
     display: flex;
     justify-content: center;
@@ -602,89 +609,4 @@ body {
     border-radius: 5px;
     cursor: pointer;
     font-weight: bold;
-}
-
-@media (max-width: 768px) {
-    .top-nav {
-        flex-direction: column;
-        gap: 15px;
-        text-align: center;
-        padding: 10px;
-    }
-    
-    .user-section {
-        justify-content: center;
-    }
-    
-    .container {
-        flex-direction: column;
-        margin-top: 120px; /* 为导航栏留出空间 */
-        height: calc(100vh - 120px); /* 调整高度 */
-    }
-    
-    .sidebar {
-        width: 100%;
-        margin-right: 0;
-        margin-bottom: 20px;
-    }
-    
-    .status-panel {
-        flex-direction: column;
-        gap: 10px;
-    }
-    
-    .status-item {
-        margin: 0;
-    }
-    
-    .tictactoe-board {
-        width: 300px;
-        height: 300px;
-    }
-    
-    .game-header {
-        flex-direction: column;
-        gap: 15px;
-    }
-    
-    .players-display, .game-controls {
-        width: 100%;
-    }
-
-    .input-group {
-        margin: 15px 20px;
-    }
-
-    .input-group label {
-        display: block;
-        margin-bottom: 5px;
-        font-weight: bold;
-        color: #333;
-    }
-
-    .room-name-input {
-        width: 100%;
-        padding: 10px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        font-size: 14px;
-        box-sizing: border-box;
-    }
-
-    .room-name-input:focus {
-        outline: none;
-        border-color: #4CAF50;
-        box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
-    }
-
-    #room-name-display {
-        font-weight: bold;
-        color: #4CAF50;
-    }
-}
-#online-count {
-    transition: opacity 0.3s ease;
-}
-#online-count.fade {
-    opacity: 0;
 }

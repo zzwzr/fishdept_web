@@ -101,7 +101,7 @@ function resetGame() {
     currentPlayer = 'X';
     window.settings.gameActive = false;
     gameStateArray = ['', '', '', '', '', '', '', '', ''];
-    gameState.textContent = '等待开始';
+    gameState.textContent = '未开始';
 
     const cells = document.querySelectorAll('.cell');
     cells.forEach(cell => {

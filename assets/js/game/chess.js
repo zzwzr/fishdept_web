@@ -1,344 +1,280 @@
 
 const chessBoard = document.getElementById('chess-board');
 function setupChess() {
-
     const placeholders = ['tictactoe-board'];
     placeholders.forEach(id => {
         const placeholder = document.getElementById(id);
         if (placeholder) placeholder.style.display = 'none';
     });
 
-    // 显示棋盘 
+    // 显示棋盘
     chessBoard.style.display = 'grid';
 
-    // 添加象棋模式类到游戏内容区域
-    const gameContent = document.querySelector('.game-content');
-    gameContent.classList.add('chess-mode');
-
-    createChessBoard();
-    // 更新游戏状态
-    const gameState = document.getElementById('game-state');
-    if (gameState) {
-        gameState.textContent = '未开始';
-    }
+    drawBoard();
 }
+const BOARD_WIDTH = 9;
+const BOARD_HEIGHT = 10;
+const CELL_SIZE = 60;
 
-// 初始化象棋游戏
-// function setupChess() {
+const PIECES = {
+    'R': '車', 'H': '馬', 'E': '象', 'A': '士', 'G': '將', 'C': '炮', 'P': '兵',
+    'r': '車', 'h': '馬', 'e': '相', 'a': '仕', 'g': '帥', 'c': '砲', 'p': '卒'
+};
 
-//     // 显示象棋棋盘
-//     const chessBoard = document.getElementById('chess-board');
-//     if (!chessBoard) {
-//         // 如果棋盘不存在，创建它
-//         const gameArea = document.querySelector('.game-area');
-//         const newChessBoard = document.createElement('div');
-//         newChessBoard.id = 'chess-board';
-//         newChessBoard.className = 'chess-board';
-//         gameArea.appendChild(newChessBoard);
-//         createChessBoard();
-//     } else {
-//         chessBoard.style.display = 'block';
-//         createChessBoard();
-//     }
-    
-//     // 添加象棋模式类到游戏内容区域
-//     const gameContent = document.querySelector('.game-content');
-//     gameContent.classList.add('chess-mode');
-
-//     // 更新游戏状态
-//     const gameState = document.getElementById('game-state');
-//     if (gameState) {
-//         gameState.textContent = '未开始';
-//     }
-// }
-
-// 象棋棋子初始位置
-const CHESS_INITIAL_POSITIONS = [
-    // 红方棋子（底部）
-    { piece: '車', color: 'red', row: 9, col: 0 },
-    { piece: '馬', color: 'red', row: 9, col: 1 },
-    { piece: '相', color: 'red', row: 9, col: 2 },
-    { piece: '仕', color: 'red', row: 9, col: 3 },
-    { piece: '帥', color: 'red', row: 9, col: 4 },
-    { piece: '仕', color: 'red', row: 9, col: 5 },
-    { piece: '相', color: 'red', row: 9, col: 6 },
-    { piece: '馬', color: 'red', row: 9, col: 7 },
-    { piece: '車', color: 'red', row: 9, col: 8 },
-    { piece: '炮', color: 'red', row: 7, col: 1 },
-    { piece: '炮', color: 'red', row: 7, col: 7 },
-    { piece: '兵', color: 'red', row: 6, col: 0 },
-    { piece: '兵', color: 'red', row: 6, col: 2 },
-    { piece: '兵', color: 'red', row: 6, col: 4 },
-    { piece: '兵', color: 'red', row: 6, col: 6 },
-    { piece: '兵', color: 'red', row: 6, col: 8 },
-    
-    // 黑方棋子（顶部）
-    { piece: '車', color: 'black', row: 0, col: 0 },
-    { piece: '馬', color: 'black', row: 0, col: 1 },
-    { piece: '象', color: 'black', row: 0, col: 2 },
-    { piece: '士', color: 'black', row: 0, col: 3 },
-    { piece: '將', color: 'black', row: 0, col: 4 },
-    { piece: '士', color: 'black', row: 0, col: 5 },
-    { piece: '象', color: 'black', row: 0, col: 6 },
-    { piece: '馬', color: 'black', row: 0, col: 7 },
-    { piece: '車', color: 'black', row: 0, col: 8 },
-    { piece: '炮', color: 'black', row: 2, col: 1 },
-    { piece: '炮', color: 'black', row: 2, col: 7 },
-    { piece: '卒', color: 'black', row: 3, col: 0 },
-    { piece: '卒', color: 'black', row: 3, col: 2 },
-    { piece: '卒', color: 'black', row: 3, col: 4 },
-    { piece: '卒', color: 'black', row: 3, col: 6 },
-    { piece: '卒', color: 'black', row: 3, col: 8 }
+// Initial board setup (standard Chinese Chess starting position)
+const initialBoard = [
+    ['R', 'H', 'E', 'A', 'G', 'A', 'E', 'H', 'R'],
+    ['', '', '', '', '', '', '', '', ''],
+    ['', 'C', '', '', '', '', '', 'C', ''],
+    ['P', '', 'P', '', 'P', '', 'P', '', 'P'],
+    ['', '', '', '', '', '', '', '', ''],
+    ['', '', '', '', '', '', '', '', ''],
+    ['p', '', 'p', '', 'p', '', 'p', '', 'p'],
+    ['', 'c', '', '', '', '', '', 'c', ''],
+    ['', '', '', '', '', '', '', '', ''],
+    ['r', 'h', 'e', 'a', 'g', 'a', 'e', 'h', 'r']
 ];
 
-// 创建象棋棋盘
-function createChessBoard() {
-    const chessBoard = document.getElementById('chess-board');
-    chessBoard.innerHTML = '';
-    
-    // 添加河界
+let board = JSON.parse(JSON.stringify(initialBoard));
+let selectedPiece = null;
+let currentTurn = 'red';
+
+const boardElement = document.getElementById('chess-board');
+const statusElement = document.getElementById('status');
+
+function drawBoard() {
+    // Clear board
+    boardElement.innerHTML = '';
+
+    // Draw horizontal lines
+    for (let y = 0; y <= 9; y++) {
+        const line = document.createElement('div');
+        line.classList.add('line', 'horizontal');
+        line.style.top = `${y * CELL_SIZE + 30}px`; // Offset for center
+        boardElement.appendChild(line);
+    }
+
+    // Draw vertical lines
+    for (let x = 0; x <= 8; x++) {
+        const line = document.createElement('div');
+        line.classList.add('line', 'vertical');
+        line.style.left = `${x * CELL_SIZE + 30}px`;
+        boardElement.appendChild(line);
+    }
+
+    // River label (simplified, assuming Chinese characters)
     const river = document.createElement('div');
-    river.className = 'river';
-    chessBoard.appendChild(river);
-    
-    // 添加九宫
-    const topPalace = document.createElement('div');
-    topPalace.className = 'palace';
-    chessBoard.appendChild(topPalace);
-    
-    const bottomPalace = document.createElement('div');
-    bottomPalace.className = 'palace bottom';
-    chessBoard.appendChild(bottomPalace);
-    
-    // 添加交叉点标记
-    const intersections = [
-        'top-left', 'top-right', 'bottom-left', 'bottom-right'
-    ];
-    
-    intersections.forEach(className => {
-        const intersection = document.createElement('div');
-        intersection.className = `intersection ${className}`;
-        chessBoard.appendChild(intersection);
-    });
-    
-    // 添加坐标标记
-    addCoordinates(chessBoard);
-    
-    // 添加棋子
-    CHESS_INITIAL_POSITIONS.forEach(pos => {
-        createChessPiece(pos.piece, pos.color, pos.row, pos.col, chessBoard);
-    });
-    
-    return chessBoard;
-}
+    river.id = 'river';
+    river.innerText = '楚河          漢界';
+    boardElement.appendChild(river);
 
-// 添加坐标标记
-function addCoordinates(board) {
-    const columns = ['一', '二', '三', '四', '五', '六', '七', '八', '九'];
-    const rows = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
-    
-    // 顶部坐标
-    columns.forEach((col, index) => {
-        const coord = document.createElement('div');
-        coord.className = 'coordinate top';
-        coord.textContent = columns[8 - index];
-        coord.style.left = `${(index * 11.11) + 5.55}%`;
-        board.appendChild(coord);
-    });
-    
-    // 底部坐标
-    columns.forEach((col, index) => {
-        const coord = document.createElement('div');
-        coord.className = 'coordinate bottom';
-        coord.textContent = columns[index];
-        coord.style.left = `${(index * 11.11) + 5.55}%`;
-        board.appendChild(coord);
-    });
-    
-    // 左侧坐标
-    rows.forEach((row, index) => {
-        const coord = document.createElement('div');
-        coord.className = 'coordinate left';
-        coord.textContent = 10 - index;
-        coord.style.top = `${(index * 10) + 5}%`;
-        board.appendChild(coord);
-    });
-    
-    // 右侧坐标
-    rows.forEach((row, index) => {
-        const coord = document.createElement('div');
-        coord.className = 'coordinate right';
-        coord.textContent = index + 1;
-        coord.style.top = `${(index * 10) + 5}%`;
-        board.appendChild(coord);
-    });
-}
+    // 将十字
+    const blackPalaceX1 = document.createElement('div');
+    blackPalaceX1.classList.add('palace-cross');
+    blackPalaceX1.style.left = `${3 * CELL_SIZE + 30}px`;
+    blackPalaceX1.style.top = `${0 * CELL_SIZE + 30}px`;
+    boardElement.appendChild(blackPalaceX1);
 
-// 创建棋子
-function createChessPiece(piece, color, row, col, board) {
-    const container = document.createElement('div');
-    container.className = 'chess-piece-container';
-    container.dataset.row = row;
-    container.dataset.col = col;
-    container.dataset.piece = piece;
-    container.dataset.color = color;
-    
-    const pieceElement = document.createElement('div');
-    pieceElement.className = `chess-piece piece-${color}`;
-    pieceElement.innerHTML = `<span class="piece-text">${piece}</span>`;
-    
-    // 计算位置（9列10行）
-    const left = (col * 11.11) + 5.55; // 百分比
-    const top = (row * 10) + 5; // 百分比
-    
-    container.style.left = `calc(${left}% - 32.5px)`;
-    container.style.top = `calc(${top}% - 32.5px)`;
-    
-    container.appendChild(pieceElement);
-    board.appendChild(container);
-    
-    // 添加点击事件
-    container.addEventListener('click', function() {
-        handlePieceClick(this);
-    });
-    
-    return container;
-}
+    const blackPalaceX2 = document.createElement('div');
+    blackPalaceX2.classList.add('palace-cross', 'palace-cross2');
+    blackPalaceX2.style.left = `${5 * CELL_SIZE + 30}px`;
+    blackPalaceX2.style.top = `${0 * CELL_SIZE + 30}px`;
+    boardElement.appendChild(blackPalaceX2);
 
-// 处理棋子点击
-function handlePieceClick(pieceContainer) {
-    // 移除之前选中的棋子样式
-    document.querySelectorAll('.piece-selected').forEach(el => {
-        el.classList.remove('piece-selected');
-    });
-    
-    // 添加选中样式
-    pieceContainer.querySelector('.chess-piece').classList.add('piece-selected');
-    
-    // 显示可移动位置（这里简单实现，实际需要根据象棋规则计算）
-    showPossibleMoves(pieceContainer);
-}
+    // 帅十字
+    const redPalaceX1 = document.createElement('div');
+    redPalaceX1.classList.add('palace-cross');
+    redPalaceX1.style.left = `${3 * CELL_SIZE + 30}px`;
+    redPalaceX1.style.top = `${7 * CELL_SIZE + 30}px`;
+    boardElement.appendChild(redPalaceX1);
 
-// 显示可能的移动位置
-function showPossibleMoves(pieceContainer) {
-    // 移除之前的提示
-    document.querySelectorAll('.move-hint').forEach(el => el.remove());
-    
-    const row = parseInt(pieceContainer.dataset.row);
-    const col = parseInt(pieceContainer.dataset.col);
-    const piece = pieceContainer.dataset.piece;
-    
-    // 根据棋子类型显示可能的移动位置（简化版）
-    let moves = [];
-    
-    switch(piece) {
-        case '兵':
-        case '卒':
-            moves = getSoldierMoves(row, col, pieceContainer.dataset.color);
-            break;
-        case '炮':
-            moves = getCannonMoves(row, col);
-            break;
-        case '車':
-            moves = getChariotMoves(row, col);
-            break;
-        case '馬':
-            moves = getHorseMoves(row, col);
-            break;
-        case '相':
-        case '象':
-            moves = getElephantMoves(row, col, pieceContainer.dataset.color);
-            break;
-        case '仕':
-        case '士':
-            moves = getGuardMoves(row, col);
-            break;
-        case '帥':
-        case '將':
-            moves = getGeneralMoves(row, col);
-            break;
-    }
-    
-    // 添加移动提示
-    moves.forEach(move => {
-        const hint = document.createElement('div');
-        hint.className = 'move-hint';
-        hint.style.left = `calc(${(move.col * 11.11) + 5.55}% - 7.5px)`;
-        hint.style.top = `calc(${(move.row * 10) + 5}% - 7.5px)`;
-        
-        hint.addEventListener('click', function() {
-            movePiece(pieceContainer, move.row, move.col);
-        });
-        
-        document.getElementById('chess-board').appendChild(hint);
-    });
-}
+    const redPalaceX2 = document.createElement('div');
+    redPalaceX2.classList.add('palace-cross', 'palace-cross2');
+    redPalaceX2.style.left = `${5 * CELL_SIZE + 30}px`;
+    redPalaceX2.style.top = `${7 * CELL_SIZE + 30}px`;
+    boardElement.appendChild(redPalaceX2);
 
-// 移动棋子
-function movePiece(pieceContainer, newRow, newCol) {
-    const left = (newCol * 11.11) + 5.55;
-    const top = (newRow * 10) + 5;
-    
-    pieceContainer.style.left = `calc(${left}% - 32.5px)`;
-    pieceContainer.style.top = `calc(${top}% - 32.5px)`;
-    pieceContainer.dataset.row = newRow;
-    pieceContainer.dataset.col = newCol;
-    
-    // 移除选中状态和提示
-    document.querySelectorAll('.piece-selected').forEach(el => {
-        el.classList.remove('piece-selected');
-    });
-    document.querySelectorAll('.move-hint').forEach(el => el.remove());
-}
-
-// 各种棋子的移动规则（简化版）
-function getSoldierMoves(row, col, color) {
-    const moves = [];
-    
-    if (color === 'red') {
-        // 红兵向前（向上）
-        if (row > 0) moves.push({ row: row - 1, col });
-        // 过河后可以左右移动
-        if (row <= 4) {
-            if (col > 0) moves.push({ row, col: col - 1 });
-            if (col < 8) moves.push({ row, col: col + 1 });
-        }
-    } else {
-        // 黑卒向前（向下）
-        if (row < 9) moves.push({ row: row + 1, col });
-        // 过河后可以左右移动
-        if (row >= 5) {
-            if (col > 0) moves.push({ row, col: col - 1 });
-            if (col < 8) moves.push({ row, col: col + 1 });
-        }
-    }
-    
-    return moves;
-}
-
-function getCannonMoves(row, col) {
-    // 炮的移动规则（简化）
-    const moves = [];
-    // 上下左右四个方向
-    const directions = [
-        { dr: -1, dc: 0 }, // 上
-        { dr: 1, dc: 0 },  // 下
-        { dr: 0, dc: -1 }, // 左
-        { dr: 0, dc: 1 }   // 右
-    ];
-    
-    directions.forEach(dir => {
-        for (let i = 1; i <= 9; i++) {
-            const newRow = row + dir.dr * i;
-            const newCol = col + dir.dc * i;
-            
-            if (newRow >= 0 && newRow <= 9 && newCol >= 0 && newCol <= 8) {
-                moves.push({ row: newRow, col: newCol });
+    // Draw pieces
+    for (let y = 0; y < BOARD_HEIGHT; y++) {
+        for (let x = 0; x < BOARD_WIDTH; x++) {
+            const type = board[y][x];
+            if (type) {
+                const piece = document.createElement('div');
+                piece.classList.add('piece');
+                piece.classList.add(isRed(type) ? 'red' : 'black');
+                piece.innerText = PIECES[type];
+                piece.style.left = `${x * CELL_SIZE + 5}px`; // Center in cell
+                piece.style.top = `${y * CELL_SIZE + 5}px`;
+                piece.dataset.x = x;
+                piece.dataset.y = y;
+                piece.addEventListener('click', onPieceClick);
+                boardElement.appendChild(piece);
             }
         }
-    });
-    
-    return moves;
+    }
 }
 
-// 其他棋子的移动规则可以类似实现...
+function isRed(type) {
+    return type === type.toUpperCase();
+}
+
+function onPieceClick(event) {
+    const piece = event.target;
+    const x = parseInt(piece.dataset.x);
+    const y = parseInt(piece.dataset.y);
+    const type = board[y][x];
+
+    if (selectedPiece) {
+        const sx = parseInt(selectedPiece.dataset.x);
+        const sy = parseInt(selectedPiece.dataset.y);
+
+        if (isValidMove(sx, sy, x, y, board[sy][sx])) {
+            // Move piece
+            if (board[y][x]) {
+                // Eat
+                const eatenPiece = Array.from(boardElement.children).find(p => 
+                    parseInt(p.dataset.x) === x && parseInt(p.dataset.y) === y
+                );
+                if (eatenPiece) {
+                    eatenPiece.classList.add('eaten');
+                    setTimeout(() => eatenPiece.remove(), 500);
+                }
+            }
+
+            board[y][x] = board[sy][sx];
+            board[sy][sx] = '';
+
+            // Animate movement
+            selectedPiece.classList.add('moving');
+            selectedPiece.style.left = `${x * CELL_SIZE + 5}px`;
+            selectedPiece.style.top = `${y * CELL_SIZE + 5}px`;
+            selectedPiece.dataset.x = x;
+            selectedPiece.dataset.y = y;
+
+            selectedPiece.classList.remove('selected');
+            selectedPiece = null;
+
+            currentTurn = currentTurn === 'red' ? 'black' : 'red';
+            statusElement.innerText = `${currentTurn.charAt(0).toUpperCase() + currentTurn.slice(1)}'s turn`;
+
+            checkGameOver();
+        } else {
+            selectedPiece.classList.remove('selected');
+            if (isRed(type) === (currentTurn === 'red') && type) {
+                piece.classList.add('selected');
+                selectedPiece = piece;
+            } else {
+                selectedPiece = null;
+            }
+        }
+    } else {
+        if (isRed(type) === (currentTurn === 'red') && type) {
+            piece.classList.add('selected');
+            selectedPiece = piece;
+        }
+    }
+}
+
+// Simplified validation (full rules would be more complex)
+function isValidMove(sx, sy, tx, ty, type) {
+    if (tx < 0 || tx >= BOARD_WIDTH || ty < 0 || ty >= BOARD_HEIGHT) return false;
+    const target = board[ty][tx];
+    if (target && isRed(target) === isRed(type)) return false; // Same side
+
+    const dx = Math.abs(tx - sx);
+    const dy = Math.abs(ty - sy);
+
+    switch (type.toUpperCase()) {
+        case 'R': // Rook
+            if (dx !== 0 && dy !== 0) return false;
+            return noPiecesBetween(sx, sy, tx, ty);
+        case 'H': // Horse
+            if (!((dx === 1 && dy === 2) || (dx === 2 && dy === 1))) return false;
+            // Check leg not blocked
+            const legX = dx === 1 ? 0 : (tx > sx ? 1 : -1);
+            const legY = dy === 1 ? 0 : (ty > sy ? 1 : -1);
+            return !board[sy + legY][sx + legX];
+        case 'E': // Elephant
+            if (dx !== 2 || dy !== 2) return false;
+            // Check eye not blocked
+            const eyeX = (tx + sx) / 2;
+            const eyeY = (ty + sy) / 2;
+            if (!board[eyeY][eyeX]) {
+                // Boundary for elephant
+                const isRedPiece = isRed(type);
+                if (isRedPiece && ty < 5) return false;
+                if (!isRedPiece && ty > 4) return false;
+                return true;
+            }
+            return false;
+        case 'A': // Advisor
+            if (dx !== 1 || dy !== 1) return false;
+            // Palace boundary
+            if (tx < 3 || tx > 5 || (isRed(type) ? ty > 2 : ty < 7)) return false;
+            return true;
+        case 'G': // General
+            if (dx > 1 || dy > 1 || (dx === 0 && dy === 0)) return false;
+            // Palace boundary
+            if (tx < 3 || tx > 5 || (isRed(type) ? ty > 2 : ty < 7)) return false;
+            // Flying general check (simplified, no direct face)
+            return true;
+        case 'C': // Cannon
+            if (dx !== 0 && dy !== 0) return false;
+            const piecesBetween = countPiecesBetween(sx, sy, tx, ty);
+            if (target) return piecesBetween === 1; // Eat with one over
+            return piecesBetween === 0; // Move empty
+        case 'P': // Pawn
+            const forward = isRed(type) ? -1 : 1;
+            if (dy === 0 && dx === 1) { // Side after river
+                const crossedRiver = isRed(type) ? sy <= 4 : sy >= 5;
+                return crossedRiver;
+            }
+            if (dx !== 0 || dy !== forward) return false;
+            return true;
+        default:
+            return false;
+    }
+}
+
+function noPiecesBetween(sx, sy, tx, ty) {
+    return countPiecesBetween(sx, sy, tx, ty) === 0;
+}
+
+function countPiecesBetween(sx, sy, tx, ty) {
+    let count = 0;
+    const dx = tx === sx ? 0 : (tx > sx ? 1 : -1);
+    const dy = ty === sy ? 0 : (ty > sy ? 1 : -1);
+    let x = sx + dx;
+    let y = sy + dy;
+    while (x !== tx || y !== ty) {
+        if (board[y][x]) count++;
+        x += dx;
+        y += dy;
+    }
+    return count;
+}
+
+function checkGameOver() {
+    // Simple check if general is eaten (full check would include checkmate)
+    let redGeneral = false;
+    let blackGeneral = false;
+    for (let y = 0; y < BOARD_HEIGHT; y++) {
+        for (let x = 0; x < BOARD_WIDTH; x++) {
+            if (board[y][x] === 'G') blackGeneral = true;
+            if (board[y][x] === 'g') redGeneral = true;
+        }
+    }
+    if (!redGeneral) {
+        statusElement.innerText = 'Black wins!';
+        removeAllListeners();
+    }
+    if (!blackGeneral) {
+        statusElement.innerText = 'Red wins!';
+        removeAllListeners();
+    }
+}
+
+function removeAllListeners() {
+    const pieces = document.querySelectorAll('.piece');
+    pieces.forEach(p => p.removeEventListener('click', onPieceClick));
+}
