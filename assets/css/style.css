@@ -489,16 +489,6 @@ body {
     color: #ccc;
 }
 
-.form-group input {
-    width: 100%;
-    padding: 10px;
-    border-radius: 5px;
-    border: 1px solid #444;
-    background-color: rgba(255, 255, 255, 0.1);
-    color: white;
-    font-size: 1rem;
-}
-
 .form-actions {
     display: flex;
     justify-content: space-between;
@@ -609,4 +599,30 @@ body {
     border-radius: 5px;
     cursor: pointer;
     font-weight: bold;
+}
+
+/* .form-group input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #444;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+    font-size: 1rem;
+} */
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 6px;
+    border: none;
+    outline: none;
+    font-size: 1rem;
+    background: rgba(228, 220, 220);
+}
+
+.form-group select {
+    appearance: none;
+    cursor: pointer;
 }

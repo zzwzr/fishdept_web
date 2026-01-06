@@ -156,7 +156,7 @@ async function loadRoomList() {
     }
 }
 
-async function createRoom(roomName) {
+async function createRoom(roomName, roomType) {
 
     fetch(`${HTTP}${BASE_URL}/api/v1/room`, {
         method: 'POST',
@@ -165,31 +165,32 @@ async function createRoom(roomName) {
         },
         body: JSON.stringify({
             name: roomName,
+            type: roomType,
             browser_id: browserId
         }),
     })
-        .then(async (response) => {
-            const data = await response.json().catch(() => ({}));
-            if (!response.ok) {
-                const message = data.message || `请求失败 (${response.status})`;
-                showToast('创建房间失败: ' + message, 'error');
-                throw new Error(message);
-            }
+    .then(async (response) => {
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+            const message = data.message || `请求失败 (${response.status})`;
+            showToast('创建房间失败: ' + message, 'error');
+            throw new Error(message);
+        }
 
-            // 正常逻辑
-            if (data.code === 0) {
-                const roomCode = data.data.number;
+        // 正常逻辑
+        if (data.code === 0) {
+            const roomCode = data.data.number;
 
-                loadRoomList();
-                loadRoom();
-            } else {
-                showToast('创建房间失败: ' + (data.message || '未知错误'), 'error');
-            }
-        })
-        .catch((error) => {
-            console.error('Error:', error);
-            showToast('创建房间失败，请检查网络连接', 'error');
-        });
+            loadRoomList();
+            loadRoom();
+        } else {
+            showToast('创建房间失败: ' + (data.message || '未知错误'), 'error');
+        }
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+        showToast('创建房间失败，请检查网络连接', 'error');
+    });
 }
 
 // 加入房间

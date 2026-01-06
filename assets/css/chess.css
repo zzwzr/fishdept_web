@@ -1,145 +1,114 @@
-/*body {
-    background-color: #f0d9b5;
-    font-family: Arial, sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
-    color: #333;
-}*/
-
+/* 棋盘容器样式 */
 #chess-board {
     position: relative;
-    width: 540px; /* 9 columns * 60px */
-    height: 600px; /* 10 rows * 60px */
-    background-color: #b58863; /* Dark wood color */
-    border: 10px solid #8b5a2b; /* Wooden frame */
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    background-color: #f0d9b5; /* 浅木色背景 */
+    border: 4px solid #8B4513;
+    border-radius: 5px;
+    margin: 0 auto;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    overflow: visible; /* 允许内容超出容器 */
 }
 
-.line {
+/* 棋盘格子（点击区域） */
+.chess-cell {
+    position: absolute;
+    background-color: transparent;
+    cursor: pointer;
+    z-index: 5; /* 确保在棋子和线条之上 */
+}
+
+/* 棋盘线条样式 */
+.board-line {
     position: absolute;
     background-color: #000;
+    pointer-events: none;
+    z-index: 1;
 }
 
-.horizontal {
-    height: 2px;
-    width: 480px; /* 8 gaps * 60px */
-    left: 30px;
+/* 横线 */
+.horizontal-line {
+    height: 1px;
+    width: 100%; /* 会根据棋盘宽度自动调整 */
 }
 
-.vertical {
-    width: 2px;
-    height: 540px; /* 9 gaps * 60px */
-    top: 30px;
+/* 竖线 */
+.vertical-line {
+    width: 1px;
+    height: 100%; /* 会根据棋盘高度自动调整 */
 }
 
-#river {
-    position: absolute;
-    top: 270px; /* Between row 4 and 5 (0-based) */
-    left: 30px;
-    width: 480px;
-    height: 60px;
-    background-color: rgba(0, 128, 255, 0.2); /* Light blue for river */
-    border-top: 2px solid #000;
-    border-bottom: 2px solid #000;
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    font-size: 24px;
-    color: #000;
-    font-weight: bold;
+/* 斜线（九宫格） */
+.diagonal-line {
+    height: 1px;
 }
 
-.piece {
+/* 棋子样式 - 调整位置为绝对定位 */
+.chess-piece {
     position: absolute;
     width: 50px;
     height: 50px;
     border-radius: 50%;
     display: flex;
-    justify-content: center;
     align-items: center;
-    font-size: 30px;
+    justify-content: center;
+    font-size: 24px;
     font-weight: bold;
     cursor: pointer;
-    transition: transform 0.3s ease; /* Smooth movement */
     user-select: none;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    transition: transform 0.2s, box-shadow 0.2s;
+    z-index: 10; /* 确保棋子在线条和点击区域之上 */
+    /* 居中定位到交叉点 */
+    transform: translate(-50%, -50%);
 }
 
-.piece.red {
-    background-color: #ff0000;
-    color: #fff;
-    border: 2px solid #cc0000;
+/* 红方棋子 */
+.red-piece {
+    background: linear-gradient(135deg, #FFD700, #B8860B);
+    color: #8B0000;
+    border: 2px solid #8B0000;
 }
 
-.piece.black {
-    background-color: #000;
-    color: #fff;
-    border: 2px solid #333;
+/* 黑方棋子 */
+.black-piece {
+    background: linear-gradient(135deg, #2F4F4F, #000000);
+    color: #F0F8FF;
+    border: 2px solid #1C1C1C;
 }
 
-.piece.selected {
-    transform: scale(1.1);
-    box-shadow: 0 0 10px #ffd700;
+.chess-piece:hover {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
 }
 
-.piece:hover {
-    transform: scale(1.05);
+/* 选中状态的棋子 */
+.chess-piece.selected {
+    box-shadow: 0 0 0 3px #FFD700, 0 0 10px 3px #FFD700;
+    animation: pulse 1.5s infinite;
 }
 
-/* Eating effect: fade out */
-.piece.eaten {
-    animation: eat 0.5s forwards;
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.5), 0 0 10px 3px rgba(255, 215, 0, 0.5); }
+    50% { box-shadow: 0 0 0 5px rgba(255, 215, 0, 0.8), 0 0 15px 5px rgba(255, 215, 0, 0.8); }
+    100% { box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.5), 0 0 10px 3px rgba(255, 215, 0, 0.5); }
 }
 
-@keyframes eat {
-    to {
-        opacity: 0;
-        transform: scale(0);
-    }
+/* 被吃的棋子动画 */
+.chess-piece.eaten {
+    animation: fadeOut 0.3s forwards;
 }
 
-/* Movement effect */
-.piece.moving {
-    transition: left 0.5s ease, top 0.5s ease;
+@keyframes fadeOut {
+    from { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    to { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
 }
 
-#status {
-    margin-top: 20px;
+/* 楚河汉界文字 */
+.river-text {
+    position: absolute;
     font-size: 18px;
-    color: #333;
-}
-
-/* Palace crosses */
-.palace-cross {
-    position: absolute;
-    width: 2px;
-    height: 120px;
-    background-color: #000;
-    transform: rotate(45deg);
-}
-
-.palace-cross2 {
-    transform: rotate(-45deg);
-}
-
-.line-v {
-    position: absolute;
-    top: 30px;
-    bottom: 30px;
-    width: 2px;
-    background: #2c1f16;
-    
-    /* 新增：剪掉楚河汉界那一段（270px ~ 330px） */
-    clip-path: polygon(
-        0 0,        /* 顶部 */
-        100% 0,
-        100% 45%,   /* 河上面（270/600 ≈ 45%） */
-        0 45%,
-        0 55%,      /* 河下面（330/600 ≈ 55%） */
-        100% 55%,
-        100% 100%,  /* 底部 */
-        0 100%
-    );
+    font-weight: bold;
+    color: #8B4513;
+    font-family: 'Microsoft YaHei', sans-serif;
+    pointer-events: none;
+    z-index: 2; /* 在棋子和线条之间 */
 }
