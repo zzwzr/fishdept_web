@@ -21,7 +21,8 @@ const statusMap = {
 };
 
 window.settings = {
-    gameActive: false
+    gameActive: false,
+    currentRoom: null,
 };
 
 // 结束弹窗
@@ -44,26 +45,31 @@ async function loadRoom() {
     roomIdElement.textContent = data.data.number;
     roomName.textContent = data.data.name;
     gameState.textContent = statusMap[data.data.status] || "未开始";
-
     window.settings.gameActive = data.data.status == 2;
 
     player1Name.textContent = data.data.player1 || player1Name.textContent;
     player2Name.textContent = data.data.player2 || player2Name.textContent;
 
-    currentRoom = {
+    if (2 == data.data.type) {
+        p = data.data.player1 === browserId ? 'R' : 'B'
+        renderChessBoard(data.data.board);
+    } else {
+        renderBoard(data.data.board);
+        p = data.data.player1 === browserId ? 'X' : 'O'
+    }
+
+    // 房间信息
+    window.settings.currentRoom = {
         id: data.data.number,
         name: data.data.name,
+        type: data.data.type,
         players: { 1: data.data.player1, 2: data.data.player2 },
         status: data.data.status,
-        p: data.data.player1 === browserId ? 'X' : 'O'
+        p: p
     };
-
-    console.log(currentRoom);
+    console.log(window.settings.currentRoom);
 
     checkIfGameCanStart();
-
-    // 井字棋，加载棋盘
-    renderBoard(data.data.board);
 
     if (data.data.status == 3) {
         showGameOver('游戏已结束');
@@ -72,7 +78,7 @@ async function loadRoom() {
 
 // 检查是否可以开始游戏
 function checkIfGameCanStart() {
-    if (currentRoom && currentRoom.players[1] && currentRoom.players[2]) {
+    if (window.settings.currentRoom && window.settings.currentRoom.players[1] && window.settings.currentRoom.players[2]) {
         startGameBtn.disabled = false;
     } else {
         startGameBtn.disabled = true;
@@ -81,7 +87,7 @@ function checkIfGameCanStart() {
 
 // 开始游戏功能
 startGameBtn.addEventListener('click', function () {
-    if (!currentRoom || !currentRoom.players[1] || !currentRoom.players[2]) {
+    if (!window.settings.currentRoom || !window.settings.currentRoom.players[1] || !window.settings.currentRoom.players[2]) {
         showToast('需要两名玩家才能开始游戏', 'error');
         return;
     }

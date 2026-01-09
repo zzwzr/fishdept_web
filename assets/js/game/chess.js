@@ -1,17 +1,5 @@
 const chessBoard = document.getElementById('chess-board');
 
-function setupChess() {
-    const placeholders = ['tictactoe-board'];
-    placeholders.forEach(id => {
-        const placeholder = document.getElementById(id);
-        if (placeholder) placeholder.style.display = 'none';
-    });
-
-    // 显示棋盘
-    chessBoard.style.display = 'grid';
-
-    drawBoard();
-}
 
 const BOARD_WIDTH = 9;  // 9列
 const BOARD_HEIGHT = 10; // 10行
@@ -39,15 +27,187 @@ const initialBoard = [
 
 let board = JSON.parse(JSON.stringify(initialBoard));
 let selectedPiece = null;
-let currentTurn = 'red';
+
+function renderChessBoard(newBoard) {
+    if (!Array.isArray(newBoard) || newBoard.length === 0) return;
+
+    board = JSON.parse(JSON.stringify(newBoard));
+    setupChess();
+    drawPieces();
+}
 
 // 检查是否是红方棋子
 function isRed(type) {
     return type === type.toUpperCase();
 }
 
-// 简化的移动验证（完整规则更复杂）
+function setupChess() {
+    const placeholders = ['tictactoe-board'];
+    placeholders.forEach(id => {
+        const placeholder = document.getElementById(id);
+        if (placeholder) placeholder.style.display = 'none';
+    });
+
+    // 显示棋盘
+    chessBoard.style.display = 'grid';
+
+    drawBoard();
+}
+
+// 绘制所有棋子
+function drawPieces() {
+    // 移除现有的棋子
+    document.querySelectorAll('.chess-piece').forEach(piece => piece.remove());
+
+    for (let row = 0; row < BOARD_HEIGHT; row++) {
+        for (let col = 0; col < BOARD_WIDTH; col++) {
+            const type = board[row][col];
+            if (type) {
+                const piece = createPiece(row, col, type);
+                
+                // 如果这个棋子之前被选中，恢复选中状态
+                // if (selectedPiece && 
+                //     parseInt(selectedPiece.dataset.row) === row && 
+                //     parseInt(selectedPiece.dataset.col) === col) {
+                //     piece.classList.add('selected');
+                // }
+            }
+        }
+    }
+}
+
+function movePiece(fromRow, fromCol, toRow, toCol) {
+    console.log(`请求移动: (${fromRow},${fromCol}) -> (${toRow},${toCol})`);
+
+    wsSend({
+        type: 'MOVE',
+        room_id: roomIdElement.textContent,
+        from_row: fromRow,
+        from_col: fromCol,
+        to_row: toRow,
+        to_col: toCol
+    });
+}
+
+// 处理棋子点击的函数
+function onPieceClick(row, col, type) {
+    const room = window.settings?.currentRoom;
+
+    console.log(`点击棋子: 行${row}, 列${col}, 类型 ${type}`);
+
+    // 检查是否可以选中（当前回合的棋子）
+    if (isRed(type) === (room.p === 'R')) {
+        // 如果已经有选中的棋子，先取消选中
+        if (selectedPiece) {
+            selectedPiece.classList.remove('selected');
+        }
+
+        // 选中新棋子
+        const pieceElement = document.querySelector(`.chess-piece[data-row="${row}"][data-col="${col}"]`);
+        if (pieceElement) {
+            selectedPiece = pieceElement;
+            selectedPiece.classList.add('selected');
+            console.log(`选中棋子: ${type}`);
+        }
+    } else {
+        // 点击的是对方棋子，尝试移动
+        if (selectedPiece) {
+            const fromRow = parseInt(selectedPiece.dataset.row);
+            const fromCol = parseInt(selectedPiece.dataset.col);
+            const pieceType = selectedPiece.dataset.type;
+            
+            if (isValidMove(fromRow, fromCol, row, col, pieceType)) {
+                movePiece(fromRow, fromCol, row, col);
+            } else {
+                selectedPiece.classList.remove('selected');
+                selectedPiece = null;
+                console.log('移动不合法');
+            }
+        }
+    }
+}
+
+// // 移动棋子
+// function movePiece(fromRow, fromCol, toRow, toCol) {
+//     console.log(`移动棋子从 (${fromRow},${fromCol}) 到 (${toRow},${toCol})`);
+
+//     // 获取棋子类型
+//     const pieceType = board[fromRow][fromCol];
+
+//     // 检查目标位置是否有棋子（吃子）
+//     if (board[toRow][toCol]) {
+//         const eatenPiece = document.querySelector(`.chess-piece[data-row="${toRow}"][data-col="${toCol}"]`);
+//         if (eatenPiece) {
+//             eatenPiece.classList.add('eaten');
+//             setTimeout(() => {
+//                 if (eatenPiece.parentNode) {
+//                     eatenPiece.remove();
+//                 }
+//             }, 300);
+//         }
+//     }
+
+//     // 更新棋盘数据
+//     board[toRow][toCol] = pieceType;
+//     board[fromRow][fromCol] = '';
+
+//     // 更新选中的棋子位置
+//     if (selectedPiece) {
+//         selectedPiece.dataset.row = toRow;
+//         selectedPiece.dataset.col = toCol;
+
+//         // 更新棋子位置
+//         selectedPiece.style.left = `${toCol * CELL_SIZE}px`;
+//         selectedPiece.style.top = `${toRow * CELL_SIZE}px`;
+        
+//         // 移除选中状态
+//         selectedPiece.classList.remove('selected');
+//         selectedPiece = null;
+//     }
+
+//     // 切换回合
+//     currentTurn = currentTurn === 'red' ? 'black' : 'red';
+//     console.log(`当前回合: ${currentTurn}`);
+
+//     // 检查游戏是否结束
+//     // checkGameOver();
+
+//     // 重新绘制棋子（确保选中状态被清除）
+//     drawPieces();
+// }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// 简化的移动验证
 function isValidMove(sx, sy, tx, ty, type) {
+    return true;
 
     if (tx < 0 || tx >= BOARD_WIDTH || ty < 0 || ty >= BOARD_HEIGHT) return false;
     const target = board[ty][tx];
@@ -123,27 +283,6 @@ function countPiecesBetween(sx, sy, tx, ty) {
         y += dy;
     }
     return count;
-}
-
-function checkGameOver() {
-    // 简单检查将/帅是否被吃
-    let redGeneral = false;
-    let blackGeneral = false;
-    for (let y = 0; y < BOARD_HEIGHT; y++) {
-        for (let x = 0; x < BOARD_WIDTH; x++) {
-            if (board[y][x] === 'G') blackGeneral = true;
-            if (board[y][x] === 'g') redGeneral = true;
-        }
-    }
-
-    if (!redGeneral) {
-        alert('黑方获胜！');
-        removeAllListeners();
-    }
-    if (!blackGeneral) {
-        alert('红方获胜！');
-        removeAllListeners();
-    }
 }
 
 function removeAllListeners() {
@@ -237,12 +376,12 @@ function createBoardGrid() {
 
 // 在 drawBoard 函数中添加棋盘容器尺寸调整
 function drawBoard() {
+
     createBoardGrid();
 
     // 设置棋盘容器精确尺寸
     chessBoard.style.width = `${(BOARD_WIDTH - 1) * CELL_SIZE}px`;
     chessBoard.style.height = `${(BOARD_HEIGHT - 1) * CELL_SIZE}px`;
-
     drawBoardLines();
     drawPieces();
     addRiverText();
@@ -299,16 +438,6 @@ function addRiverText() {
     chessBoard.appendChild(hanjie);
 }
 
-
-
-
-
-
-
-
-
-
-
 // 创建棋子元素
 function createPiece(row, col, type) {
     const piece = document.createElement('div');
@@ -336,42 +465,6 @@ function createPiece(row, col, type) {
     return piece;
 }
 
-// 处理棋子点击的函数
-function onPieceClick(row, col, type) {
-    console.log(`点击棋子: 行${row}, 列${col}, 类型${type}`);
-    
-    // 检查是否可以选中（当前回合的棋子）
-    if (isRed(type) === (currentTurn === 'red')) {
-        // 如果已经有选中的棋子，先取消选中
-        if (selectedPiece) {
-            selectedPiece.classList.remove('selected');
-        }
-        
-        // 选中新棋子
-        const pieceElement = document.querySelector(`.chess-piece[data-row="${row}"][data-col="${col}"]`);
-        if (pieceElement) {
-            selectedPiece = pieceElement;
-            selectedPiece.classList.add('selected');
-            console.log(`选中棋子: ${type}`);
-        }
-    } else {
-        // 点击的是对方棋子，尝试移动
-        if (selectedPiece) {
-            const fromRow = parseInt(selectedPiece.dataset.row);
-            const fromCol = parseInt(selectedPiece.dataset.col);
-            const pieceType = selectedPiece.dataset.type;
-            
-            if (isValidMove(fromRow, fromCol, row, col, pieceType)) {
-                movePiece(fromRow, fromCol, row, col);
-            } else {
-                selectedPiece.classList.remove('selected');
-                selectedPiece = null;
-                console.log('移动不合法');
-            }
-        }
-    }
-}
-
 // 只处理空格子点击
 function onCellClick(row, col) {
     console.log(`点击空格: 行${row}, 列${col}`);
@@ -392,78 +485,6 @@ function onCellClick(row, col) {
             selectedPiece = null;
             drawPieces(); // 重新绘制棋子以清除选中状态
             console.log('移动不合法');
-        }
-    }
-}
-
-// 移动棋子
-function movePiece(fromRow, fromCol, toRow, toCol) {
-    console.log(`移动棋子从 (${fromRow},${fromCol}) 到 (${toRow},${toCol})`);
-
-    // 获取棋子类型
-    const pieceType = board[fromRow][fromCol];
-
-    // 检查目标位置是否有棋子（吃子）
-    if (board[toRow][toCol]) {
-        const eatenPiece = document.querySelector(`.chess-piece[data-row="${toRow}"][data-col="${toCol}"]`);
-        if (eatenPiece) {
-            eatenPiece.classList.add('eaten');
-            setTimeout(() => {
-                if (eatenPiece.parentNode) {
-                    eatenPiece.remove();
-                }
-            }, 300);
-        }
-    }
-
-    // 更新棋盘数据
-    board[toRow][toCol] = pieceType;
-    board[fromRow][fromCol] = '';
-
-    // 更新选中的棋子位置
-    if (selectedPiece) {
-        selectedPiece.dataset.row = toRow;
-        selectedPiece.dataset.col = toCol;
-        
-        // 更新棋子位置
-        selectedPiece.style.left = `${toCol * CELL_SIZE}px`;
-        selectedPiece.style.top = `${toRow * CELL_SIZE}px`;
-        
-        // 移除选中状态
-        selectedPiece.classList.remove('selected');
-        selectedPiece = null;
-    }
-
-    // 切换回合
-    currentTurn = currentTurn === 'red' ? 'black' : 'red';
-    console.log(`当前回合: ${currentTurn}`);
-
-    // 检查游戏是否结束
-    checkGameOver();
-
-    // 重新绘制棋子（确保选中状态被清除）
-    drawPieces();
-}
-
-// 绘制所有棋子
-function drawPieces() {
-    // 移除现有的棋子
-    document.querySelectorAll('.chess-piece').forEach(piece => piece.remove());
-    
-    // 绘制所有棋子
-    for (let row = 0; row < BOARD_HEIGHT; row++) {
-        for (let col = 0; col < BOARD_WIDTH; col++) {
-            const type = board[row][col];
-            if (type) {
-                const piece = createPiece(row, col, type);
-                
-                // 如果这个棋子之前被选中，恢复选中状态
-                if (selectedPiece && 
-                    parseInt(selectedPiece.dataset.row) === row && 
-                    parseInt(selectedPiece.dataset.col) === col) {
-                    piece.classList.add('selected');
-                }
-            }
         }
     }
 }

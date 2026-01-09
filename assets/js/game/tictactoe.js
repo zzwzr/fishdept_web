@@ -57,18 +57,8 @@ function cellClicked(e) {
         wsSend({
             type: 'MOVE',
             room_id: roomIdElement.textContent,
-            browser_id: browserId,
             index: cellIndex
         });
-        // const res = sendMoveRequest({
-        //     room_id: roomIdElement.textContent,
-        //     browser_id: browserId,
-        //     index: cellIndex
-        // });
-
-        // if (res.winner) {
-        //     gameOver(res.winner);
-        // }
 
     } catch (err) {
         console.error(err);
@@ -83,6 +73,8 @@ function renderBoard(board) {
     if (!board) {
         return;
     }
+
+    setupTicTacToe();
     gameStateArray = board;
 
     const cells = document.querySelectorAll('.cell');

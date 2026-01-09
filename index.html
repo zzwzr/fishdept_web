@@ -208,6 +208,7 @@
     <script src="./assets/js/websocket.js"></script>
     <script src="./assets/js/api.js"></script>
     <script src="./assets/js/app.js"></script>
+
     <script src="./assets/js/game/tictactoe.js"></script>
     <script src="./assets/js/game/chess.js"></script>
     <script>
@@ -339,10 +340,6 @@
 
             // 加载是否在房间内
             loadRoom();
-
-            // 首页进来井字棋
-            setupTicTacToe();
-            // setupChess();
 
             connectWebSocket(browserId)
         });
