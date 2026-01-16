@@ -42,22 +42,11 @@ async function loadRoom() {
     const data = await res.json();
     if (data.code !== 0) throw new Error(data.message || '获取房间信息失败');
 
-    roomIdElement.textContent = data.data.number;
-    roomName.textContent = data.data.name;
-    gameState.textContent = statusMap[data.data.status] || "未开始";
-    window.settings.gameActive = data.data.status == 2;
-
-    player1Name.textContent = data.data.player1 || player1Name.textContent;
-    player2Name.textContent = data.data.player2 || player2Name.textContent;
-
     if (2 == data.data.type) {
         p = data.data.player1 === browserId ? 'R' : 'B'
-        renderChessBoard(data.data.board);
     } else {
-        renderBoard(data.data.board);
         p = data.data.player1 === browserId ? 'X' : 'O'
     }
-
     // 房间信息
     window.settings.currentRoom = {
         id: data.data.number,
@@ -67,6 +56,21 @@ async function loadRoom() {
         status: data.data.status,
         p: p
     };
+
+    roomIdElement.textContent = data.data.number;
+    roomName.textContent = data.data.name;
+    gameState.textContent = statusMap[data.data.status] || "未开始";
+    window.settings.gameActive = data.data.status == 2;
+
+    player1Name.textContent = data.data.player1 || player1Name.textContent;
+    player2Name.textContent = data.data.player2 || player2Name.textContent;
+
+    if (2 == data.data.type) {
+        renderChessBoard(data.data.board);
+    } else {
+        renderBoard(data.data.board);
+    }
+
     console.log(window.settings.currentRoom);
 
     checkIfGameCanStart();
@@ -244,4 +248,14 @@ async function loadLink() {
         // 淡入
         el.classList.remove('fade');
     }, 150);
+}
+
+async function setActiveTab(type) {
+    const el = document.querySelector(`.tab-item[data-tab="${type}"]`);
+    if (!el) return;
+
+    document.querySelectorAll('.tab-item')
+      .forEach(t => t.classList.remove('active'));
+
+    el.classList.add('active');
 }

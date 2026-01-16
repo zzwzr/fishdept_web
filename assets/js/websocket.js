@@ -89,28 +89,3 @@ function tictactoeMove({ index, p }) {
     cell.textContent = p;
     cell.className = 'cell ' + p.toLowerCase();
 }
-
-function chessMove({ from_row, from_col, to_row, to_col }) {
-    console.log(`动画移动: (${from_row},${from_col}) -> (${to_row},${to_col})`);
-
-    const movingPiece = document.querySelector(`.chess-piece[data-row="${from_row}"][data-col="${from_col}"]`);
-
-    if (!movingPiece) {
-        console.error('找不到要移动的棋子');
-        return;
-    }
-
-    // 如果目标有子，执行吃子动画
-    const eatenPiece = document.querySelector(`.chess-piece[data-row="${to_row}"][data-col="${to_col}"]`);
-
-    if (eatenPiece) {
-        eatenPiece.classList.add('eaten');
-        setTimeout(() => eatenPiece.remove(), 200);
-    }
-
-    // 更新 DOM 位置
-    movingPiece.dataset.row = to_row;
-    movingPiece.dataset.col = to_col;
-    movingPiece.style.left = `${to_col * CELL_SIZE}px`;
-    movingPiece.style.top = `${to_row * CELL_SIZE}px`;
-}

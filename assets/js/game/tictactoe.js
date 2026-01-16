@@ -1,4 +1,5 @@
 const tictactoeBoard = document.getElementById('tictactoe-board');
+
 // 游戏状态变量
 let currentPlayer = 'X';
 
@@ -69,6 +70,8 @@ function cellClicked(e) {
 }
 
 function renderBoard(board) {
+    setActiveTab('tic-tac-toe');
+    document.getElementById('game-title').textContent = '井字棋';
 
     if (!board) {
         return;
